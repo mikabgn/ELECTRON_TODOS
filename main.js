@@ -1,13 +1,15 @@
 // Processus principale
 
-const {app, BrowserWindow, ipcMain} = require("electron")
+const {app, BrowserWindow, ipcMain, Menu} = require("electron")
 const path = require('path')
 const electron = require("electron");
+
+let window;
 
 //.Créer la fenetre principale
 
 function createWindow () {
-    const window = new BrowserWindow({
+    window = new BrowserWindow({
         width : 800,
         height : 600 ,
         webPreferences: {
@@ -18,9 +20,59 @@ function createWindow () {
         }
     })
 
+    // Création du menu
+    createMenu()
+
     window.loadFile('src/pages/index.html');
 
 }
+
+//Fonction permettant de créé un menu perso
+function createMenu(){
+ //Créer un tableau qui representera la structure du menu
+    const templat = [
+        {
+            label: "App",
+            submenu: [
+                {
+                    label: "Versions",
+                    click: () => window.loadFile('src/pages/index.html')
+                },
+                {
+                  type: 'separator'
+                },
+                {
+                    label: "Quitter",
+                    accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q' ,
+                    click: () => app.quit()
+                }
+            ]
+        },
+        {
+            label: "Tâche",
+            submenu: [
+                {
+                    label: "Lister",
+                    click: () => window.loadFile('src/pages/list-taches.html')
+                },
+                {
+                    type: 'separator'
+                },
+                {
+                    label: "Ajouter",
+                    click: () => window.loadFile('src/pages/ajout-taches.html')
+                }
+            ]
+        }
+    ]
+
+    // Créer le menu à partir du modéle
+    const menu = Menu.buildFromTemplate(templat)
+    // Définir e menu comme etant celui de l'appli
+    Menu.setApplicationMenu(menu)
+
+}
+
 
 //Attendre l'initialisation del'application au demarrage
 app.whenReady().then( () => {
